@@ -40,8 +40,8 @@
 </form>
 
 <script>
-  // 1. Chargement des données du Google Sheet en CSV
   const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR3h6RBTaj1SgR-fy40W4Z8pecWoybSqV_GWbhYWDCuTFxLdQ0slXsJzAchd3VgmgqNE6Ck8gqF0WrF/pub?gid=353221896&single=true&output=csv";
+  const scriptURL = "https://script.google.com/macros/s/AKfycbz2aXim4svHTqEpgQsBADo69AMFMZSScmHN2JdkhsxtVd9tDXr92kn8Ng219gvONt1hHQ/exec";
 
   fetch(csvUrl)
     .then(res => res.text())
@@ -61,8 +61,8 @@
         });
         tbody.appendChild(tr);
 
-        labels.push(row[0]); // Date
-        soldes.push(parseFloat(row[5]) || 0); // Solde
+        labels.push(row[0]);
+        soldes.push(parseFloat(row[5]) || 0);
       });
 
       const ctx = document.getElementById('balanceChart').getContext('2d');
@@ -78,16 +78,16 @@
           }]
         }
       });
+    })
+    .catch(error => {
+      console.error("Erreur de chargement CSV:", error);
+      alert("Erreur lors du chargement des données !");
     });
 
-  // 2. Envoi des données vers Google Apps Script
   document.getElementById("add-form").addEventListener("submit", function(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData.entries());
-
-    // Ton Google Apps Script Web App URL
-    const scriptURL = "https://script.google.com/macros/s/AKfycbz2aXim4svHTqEpgQsBADo69AMFMZSScmHN2JdkhsxtVd9tDXr92kn8Ng219gvONt1hHQ/exec";
 
     fetch(scriptURL, {
       method: "POST",
@@ -97,9 +97,12 @@
     .then(res => res.text())
     .then(() => {
       alert("Ajouté avec succès !");
-      location.reload(); // Recharge le graphique et tableau
+      location.reload();
     })
-    .catch(err => alert("Erreur : " + err));
+    .catch(err => {
+      console.error("Erreur d'envoi :", err);
+      alert("Erreur d'envoi des données !");
+    });
   });
 </script>
 
